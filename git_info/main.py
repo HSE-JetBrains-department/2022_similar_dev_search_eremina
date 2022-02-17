@@ -32,17 +32,27 @@ def get_repo_url(ctx, url):
 
 
 @cli.command()
-@click.option('--dir',
-              prompt='Enter path to directory',
+@click.option('--repo_dir',
+              prompt='Enter path to repo directory',
               type=click.Path())
 @click.pass_context
-def get_directory(ctx, dir):
-    click.echo(f"Path to repo directory: {dir}")
-    ctx.obj['DIR'] = dir
+def get_repo_directory(ctx, repo_dir):
+    click.echo(f"Path to repo directory: {repo_dir}")
+    ctx.obj['REPO_DIR'] = repo_dir
+
+
+@cli.command()
+@click.option('--data_dir',
+              prompt='Enter path to directory to save data about repo',
+              type=click.Path())
+@click.pass_context
+def get_data_directory(ctx, data_dir):
+    click.echo(f"Path to data directory: {data_dir}")
+    ctx.obj['DATA_DIR'] = data_dir
     if 'URL' in ctx.obj.keys():
-        process_repo(repo=ctx.obj['DIR'], url=ctx.obj['URL'])
+        process_repo(repo_dir=ctx.obj['REPO_DIR'], data_dir=ctx.obj['DATA_DIR'], url=ctx.obj['URL'])
     else:
-        process_repo(repo=ctx.obj['DIR'])
+        process_repo(repo_dir=ctx.obj['REPO_DIR'], data_dir=ctx.obj['DATA_DIR'])
 
 
 if __name__ == '__main__':
