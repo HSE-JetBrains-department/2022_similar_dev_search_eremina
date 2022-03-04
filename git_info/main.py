@@ -18,5 +18,5 @@ def get_input(repo_dir: str, repo_url: str, data_dir: str):
     process_repo(repo_dir, data_dir, repo_url)
 
 
-if __name__ == "_main__":
+if __name__ == "__main__":
     get_input()
