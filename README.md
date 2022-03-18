@@ -1,3 +1,4 @@
+
 # Code as Data. Developer similarity
 
 # Project objectives
@@ -23,3 +24,17 @@
 # Course grade
 GRADE = (github_api * 0.15 + git * 0.25 + enry * 0.2 + tree_sitter * 0.25 + similar_dev_search * 0.15) * 8 + (tests + style_check + docker) * 2/3 \
 Each item represents corresponding hometask
+
+
+# Part 1: Extracting information from repository
+To run this part open terminal and execute following commands:
+```shell
+$ git clone https://github.com/d-eremina/2022_similar_dev_search_eremina.git
+$ pip install -r git_info/requirements.txt
+$ python3 git_info/main.py -r ... -u ... -o ...
+```
+```
+-r – path to repo directory
+-u – url of remote repository [optional]
+-o – file path to save output data
+```
