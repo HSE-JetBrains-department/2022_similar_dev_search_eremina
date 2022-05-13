@@ -26,15 +26,19 @@ GRADE = (github_api * 0.15 + git * 0.25 + enry * 0.2 + tree_sitter * 0.25 + simi
 Each item represents corresponding hometask
 
 
-# Part 1: Extracting information from repository
+# Part 2: Extracting information from stargazers' repositories
+## Description
+Script is meant to save information about commits from most starred repositories by stargazers of provided one
+## Usage
 To run this part open terminal and execute following commands:
 ```shell
 $ git clone https://github.com/d-eremina/2022_similar_dev_search_eremina.git
 $ pip install -r git_info/requirements.txt
-$ python3 git_info/main.py -r ... -u ... -o ...
+$ python3 git_info/main.py -r ... -u ... -o ... -t ...
 ```
 ```
--r – path to repo directory
--u – url of remote repository [optional]
+-r – path to clone repositories
+-u – url of remote repository to extract data from
 -o – file path to save output data
+-t – github access token for PyGithub interaction
 ```
