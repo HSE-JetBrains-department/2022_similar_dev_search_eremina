@@ -1,10 +1,10 @@
 import difflib
 import json
 import logging
-import shutil
+import os.path
 import traceback
+from typing import List, Tuple
 
-from typing import Tuple, List
 from dulwich import porcelain
 from dulwich.objects import ShaFile
 from dulwich.repo import Repo
@@ -45,11 +45,11 @@ class GitSummarizer:
                     deleted += 1
         return added, deleted
 
-    def save_commits_data(self) -> None:
+    def save_commits_data(self, path) -> None:
         """
         Saves data about commits in provided directory
         """
-        repo = Repo(self.clone_dir)
+        repo = Repo(path)
         for entry in repo.get_walker():
             if len(entry.commit.parents) < 2:
                 repo_url = f"""{repo.get_config().get(("remote", "origin"), "url")}"""
@@ -60,18 +60,18 @@ class GitSummarizer:
                     "deleted": 0
                 }
 
-                for change in entry.changes():
-                    file = (change.new.path or change.old.path).decode()
-                    try:
-                        match (change.old.sha, change.new.sha):
-                            case (None, new_sha):
-                                stats["added"] += len(_into_lines(repo, new_sha))
-                            case (old_sha, None):
-                                stats["deleted"] += len(_into_lines(repo, old_sha))
-                            case (old_sha, new_sha):
-                                stats["added"], stats["deleted"] = GitSummarizer.get_diffs(repo, old_sha, new_sha)
+                with open(self.output_file, "a") as f:
+                    for change in entry.changes():
+                        file = (change.new.path or change.old.path).decode()
+                        try:
+                            match (change.old.sha, change.new.sha):
+                                case (None, new_sha):
+                                    stats["added"] += len(_into_lines(repo, new_sha))
+                                case (old_sha, None):
+                                    stats["deleted"] += len(_into_lines(repo, old_sha))
+                                case (old_sha, new_sha):
+                                    stats["added"], stats["deleted"] = GitSummarizer.get_diffs(repo, old_sha, new_sha)
 
-                        with open(self.output_file, "a") as f:
                             json.dump({
                                 "repository": repo_url,
                                 "sha": commit_sha,
@@ -81,30 +81,29 @@ class GitSummarizer:
                                 "deleted": stats["deleted"]
                             }, f)
                             f.write("\n")
-                    except (IOError, UnicodeError):
-                        logging.error(
-                            f"""
-                                Error in repo: {repo_url}\n
-                                Commit: {commit_sha}\n
-                                In file: {file}\n
-                                {traceback.format_exc()}
-                            """)
+                        except (IOError, UnicodeError, KeyError):
+                            logging.error(
+                                f"""
+                                    Error in repo: {repo_url}\n
+                                    Commit: {commit_sha}\n
+                                    In file: {file}\n
+                                    {traceback.format_exc()}
+                                """)
 
     def process_repo(self, repo_url: str) -> None:
         """
         Helper to call repository data processing
         :param repo_url: url of remote repository
         """
-        try:
-            shutil.rmtree(self.clone_dir)
-        except FileNotFoundError:
-            pass
-        porcelain.clone(repo_url, self.clone_dir)
-        self.save_commits_data()
+        path = self.clone_dir + "/" + repo_url.split("/")[-1][:-4]
+        if not os.path.isdir(path):
+            porcelain.clone(repo_url, path)
+        self.save_commits_data(path)
 
     def extract_info(self) -> None:
         """
         Extracts data for all urls in list of repositories
         """
         for repo_url in self.repositories:
+            logging.info(f"Started processing {repo_url}")
             self.process_repo(repo_url)

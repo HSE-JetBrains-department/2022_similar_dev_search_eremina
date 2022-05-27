@@ -1,6 +1,7 @@
+import configparser
 import logging
 import time
-from collections import defaultdict
+from collections import Counter
 from datetime import datetime
 from typing import List
 
@@ -13,13 +14,15 @@ class StargazersExtractor:
         :param repo_url: url of remote repository to extract data from
         :param token: access token for github api
         """
-        self.repos_threshold = 10
+        config = configparser.ConfigParser()
+        config.read("./git_info/application.conf")
+        self.repos_threshold = int(config["stargazers"]["ReposThreshold"])
 
-        self.stars = defaultdict(int)
+        self.stars = Counter()
         self.url = repo_url
         self.github = Github(token)
 
-    def process_repo(self) -> List[str]:
+    def get_top_repositories(self) -> List[str]:
         """
         Processes repository's stargazers and saves data about their starred repositories
         :return: most starred repositories' names
@@ -27,7 +30,7 @@ class StargazersExtractor:
         repo = self.github.get_repo("/".join(self.url.split("/")[-2:]))
         for stargazer in repo.get_stargazers():
             self.process_starred(stargazer)
-        return sorted(self.stars, key=self.stars.get, reverse=True)[:min(len(self.stars), self.repos_threshold)]
+        return list([name for name, _ in self.stars.most_common(self.repos_threshold)])
 
     def process_starred(self, stargazer: NamedUser) -> None:
         """
