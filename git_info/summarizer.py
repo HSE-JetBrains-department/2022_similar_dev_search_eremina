@@ -48,19 +48,20 @@ class GitSummarizer:
     def save_commits_data(self, path) -> None:
         """
         Saves data about commits in provided directory
+        :param path: path to repository
         """
         repo = Repo(path)
-        for entry in repo.get_walker():
-            if len(entry.commit.parents) < 2:
-                repo_url = f"""{repo.get_config().get(("remote", "origin"), "url")}"""
-                commit_sha = entry.commit.id.decode()
-                author = entry.commit.author.decode()
-                stats = {
-                    "added": 0,
-                    "deleted": 0
-                }
+        with open(self.output_file, "a") as f:
+            for entry in repo.get_walker():
+                if len(entry.commit.parents) < 2:
+                    repo_url = f"""{repo.get_config().get(("remote", "origin"), "url")}"""
+                    commit_sha = entry.commit.id.decode()
+                    author = entry.commit.author.decode()
+                    stats = {
+                        "added": 0,
+                        "deleted": 0
+                    }
 
-                with open(self.output_file, "a") as f:
                     for change in entry.changes():
                         file = (change.new.path or change.old.path).decode()
                         try:

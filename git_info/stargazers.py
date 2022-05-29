@@ -1,23 +1,20 @@
-import configparser
 import logging
 import time
+
 from collections import Counter
 from datetime import datetime
-from typing import List
-
 from github import Github, NamedUser, RateLimitExceededException
+from typing import List
 
 
 class StargazersExtractor:
-    def __init__(self, repo_url: str, token: str):
+    def __init__(self, repo_url: str, token: str, threshold: int):
         """
         :param repo_url: url of remote repository to extract data from
         :param token: access token for github api
+        :param threshold: number of most common repositories to be selected for next processing
         """
-        config = configparser.ConfigParser()
-        config.read("./git_info/application.conf")
-        self.repos_threshold = int(config["stargazers"]["ReposThreshold"])
-
+        self.repos_threshold = threshold
         self.stars = Counter()
         self.url = repo_url
         self.github = Github(token)

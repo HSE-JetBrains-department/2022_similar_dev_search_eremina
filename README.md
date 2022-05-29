@@ -1,4 +1,5 @@
 
+
 # Code as Data. Developer similarity
 
 # Project objectives
@@ -34,11 +35,14 @@ To run this part open terminal and execute following commands:
 ```shell
 $ git clone https://github.com/d-eremina/2022_similar_dev_search_eremina.git
 $ pip install -r git_info/requirements.txt
-$ python3 git_info/main.py -r ... -u ... -o ... -t ...
+$ python3 git_info/main.py -dir ... -url ... -output ... -token ... -threshold ...
+or
+$ python3 git_info/main.py --repo-dir ... --repo-url ... --output-file ... --github-token ... --repo-threshold ...
 ```
 ```
--r – path to clone repositories
--u – url of remote repository to extract data from
--o – file path to save output data
--t – github access token for PyGithub interaction
+--repo-dir / -dir – directory with saved repositories
+--repo-url / -url – url of remote repository to extract data from
+--output-file / -output – file path to save output data
+--github-token / -token – github access token for PyGithub interaction
+--repo-threshold / -threshold – number of most common repositories among stargazers to be selected for similar developers search (optional, defaults to 10)
 ```
