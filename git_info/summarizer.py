@@ -3,11 +3,11 @@ import json
 import logging
 import os.path
 import traceback
-from typing import List, Tuple
 
 from dulwich import porcelain
 from dulwich.objects import ShaFile
 from dulwich.repo import Repo
+from typing import List, Tuple
 
 
 def _into_lines(repo: Repo, sha: ShaFile) -> List[str]:
@@ -72,7 +72,6 @@ class GitSummarizer:
                                     stats["deleted"] += len(_into_lines(repo, old_sha))
                                 case (old_sha, new_sha):
                                     stats["added"], stats["deleted"] = GitSummarizer.get_diffs(repo, old_sha, new_sha)
-
                             json.dump({
                                 "repository": repo_url,
                                 "sha": commit_sha,
