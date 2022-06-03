@@ -1,5 +1,6 @@
 
 
+
 # Code as Data. Developer similarity
 
 # Project objectives
@@ -27,22 +28,22 @@ GRADE = (github_api * 0.15 + git * 0.25 + enry * 0.2 + tree_sitter * 0.25 + simi
 Each item represents corresponding hometask
 
 
-# Part 2: Extracting information from stargazers' repositories
+# Part 3: Extracting information from stargazers' repositories
 ## Description
-Script is meant to save information about commits from most starred repositories by stargazers of provided one
+Application is meant to save information about commits from most starred repositories by stargazers of provided one
 ## Usage
-To run this part open terminal and execute following commands:
+You can run this application in docker container:
 ```shell
-$ git clone https://github.com/d-eremina/2022_similar_dev_search_eremina.git
-$ pip install -r git_info/requirements.txt
-$ python3 git_info/main.py -dir ... -url ... -output ... -token ... -threshold ...
-or
-$ python3 git_info/main.py --repo-dir ... --repo-url ... --output-file ... --github-token ... --repo-threshold ...
+$ docker run -v $repo-dir-path:$repo-dir-path -v $output-dir-path:$output-dir-path --env-file ... ereminad/similar-dev-search
 ```
+For docker volumes you provide following directories:
+*repo-dir-path* – path to directory with saved repositories
+*output-dir-path* – path to directory with future output file
 ```
---repo-dir / -dir – directory with saved repositories
---repo-url / -url – url of remote repository to extract data from
---output-file / -output – file path to save output data
---github-token / -token – github access token for PyGithub interaction
---repo-threshold / -threshold – number of most common repositories among stargazers to be selected for similar developers search (optional, defaults to 10)
+Your env file should contain following variables:
+repo-dir=... – directory with saved repositories
+repo-url=... – url of remote repository to extract data from
+output-file=... – file path to save output data
+github-token=... – github access token for PyGithub interaction
+repo-threshold=... – number of most common repositories among stargazers to be selected for similar developers search (optional, defaults to 10)
 ```
