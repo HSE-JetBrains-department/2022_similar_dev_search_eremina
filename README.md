@@ -32,18 +32,30 @@ Each item represents corresponding hometask
 ## Description
 Application is meant to save information about commits from most starred repositories by stargazers of provided one
 ## Usage
+To run this application open terminal and execute following commands:
+```shell
+$ git clone https://github.com/d-eremina/2022_similar_dev_search_eremina.git
+$ pip install -r git_info/requirements.txt
+$ python3 git_info/main.py -dir ... -url ... -output ... -token ... -threshold ...
+```
+or
+
+$ python3 git_info/main.py --repo-dir ... --repo-url ... --output-file ... --github-token ... --repo-threshold ...
+or
 You can run this application in docker container:
 ```shell
-$ docker run -v $repo-dir-path:$repo-dir-path -v $output-dir-path:$output-dir-path --env-file ... ereminad/similar-dev-search
+$ docker run -v $repo-dir-path:$repo-dir-path -v $output-dir-path:$output-dir-path ereminad/similar-dev-search $args
 ```
 For docker volumes you provide following directories:
 *repo-dir-path* – path to directory with saved repositories
 *output-dir-path* – path to directory with future output file
+For args you use the same parameters as shown for running with script
+
+Args list:
 ```
-Your env file should contain following variables:
-repo-dir=... – directory with saved repositories
-repo-url=... – url of remote repository to extract data from
-output-file=... – file path to save output data
-github-token=... – github access token for PyGithub interaction
-repo-threshold=... – number of most common repositories among stargazers to be selected for similar developers search (optional, defaults to 10)
+--repo-dir / -dir – directory with saved repositories
+--repo-url / -url – url of remote repository to extract data from
+--output-file / -output – file path to save output data
+--github-token / -token – github access token for PyGithub interaction
+--repo-threshold / -threshold – number of most common repositories among stargazers to be selected for similar developers search (optional, defaults to 10)
 ```
