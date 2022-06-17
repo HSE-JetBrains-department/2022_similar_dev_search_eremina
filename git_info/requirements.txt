@@ -2,3 +2,4 @@ click~=8.0.4
 dulwich~=0.20.32
 PyGithub~=1.55
 enry~=0.1.1
+tree_sitter~=0.19.0

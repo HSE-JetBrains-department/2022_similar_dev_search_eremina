@@ -3,12 +3,15 @@ import json
 import logging
 import os.path
 import traceback
+from typing import Dict, List, Tuple
 
 from dulwich import porcelain
 from dulwich.objects import ShaFile
 from dulwich.repo import Repo
 from enry import get_language
-from typing import List, Tuple
+from tree_sitter import Parser
+
+from tree_sitter_utils import LANGUAGES, QUERIES
 
 
 def _into_lines(repo: Repo, sha: ShaFile) -> List[str]:
@@ -35,6 +38,26 @@ def _get_file_language(repo: Repo, sha: ShaFile, path: str) -> str:
             return "None"
         case sha:
             return get_language(path, repo.get_object(sha).data)
+
+
+def _get_names_from_source(repo: Repo, sha: ShaFile, language: str) -> Dict[str, List[str]]:
+    """
+    Gets names of classes, functions and variables for supported languages
+    :param repo: Repository with data
+    :param sha: Sha of object to be inspected
+    :return: Dictionary with lists of corresponding objects' names
+    """
+    match sha:
+        case sha if sha is not None and language in LANGUAGES:
+            parser = Parser()
+            parser.set_language(LANGUAGES[language])
+            code = repo.get_object(sha).data
+            return {type: [code[capture[0].start_byte: capture[0].end_byte].decode()
+                           for _, capture in
+                           enumerate(LANGUAGES[language].query(query).captures(parser.parse(code).root_node))]
+                    for type, query in QUERIES[language].items()}
+        case _:
+            return {"classes": [], "functions": [], "variables": []}
 
 
 class GitSummarizer:
@@ -89,14 +112,19 @@ class GitSummarizer:
                                     stats["deleted"] += len(_into_lines(repo, old_sha))
                                 case (old_sha, new_sha):
                                     stats["added"], stats["deleted"] = GitSummarizer.get_diffs(repo, old_sha, new_sha)
+                            language = _get_file_language(repo, new_sha, file)
+                            names = _get_names_from_source(repo, new_sha, language.lower())
                             json.dump({
                                 "repository": repo_url,
                                 "sha": commit_sha,
                                 "file": file,
-                                "language": _get_file_language(repo, new_sha, file),
+                                "language": language,
                                 "author": author,
                                 "added": stats["added"],
-                                "deleted": stats["deleted"]
+                                "deleted": stats["deleted"],
+                                "classes": names["classes"],
+                                "functions": names["functions"],
+                                "variables": names["variables"]
                             }, f)
                             f.write("\n")
                         except (IOError, UnicodeError, KeyError):
