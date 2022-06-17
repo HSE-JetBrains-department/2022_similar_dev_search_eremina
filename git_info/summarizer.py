@@ -7,6 +7,7 @@ import traceback
 from dulwich import porcelain
 from dulwich.objects import ShaFile
 from dulwich.repo import Repo
+from enry import get_language
 from typing import List, Tuple
 
 
@@ -18,6 +19,22 @@ def _into_lines(repo: Repo, sha: ShaFile) -> List[str]:
     :return: List of lines of provided object
     """
     return repo.get_object(sha).data.decode().splitlines()
+
+
+def _get_file_language(repo: Repo, sha: ShaFile, path: str) -> str:
+    """
+    Gets language of provided by sha object in repo
+    If can not find object, returns "None"
+    :param repo: Repository with data
+    :param sha: Sha of object in repository
+    :param path: Path to file with content
+    :return: Language of given object
+    """
+    match sha:
+        case None:
+            return "None"
+        case sha:
+            return get_language(path, repo.get_object(sha).data)
 
 
 class GitSummarizer:
@@ -76,6 +93,7 @@ class GitSummarizer:
                                 "repository": repo_url,
                                 "sha": commit_sha,
                                 "file": file,
+                                "language": _get_file_language(repo, new_sha, file),
                                 "author": author,
                                 "added": stats["added"],
                                 "deleted": stats["deleted"]

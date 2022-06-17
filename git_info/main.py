@@ -1,6 +1,5 @@
 import click
 from github import Github
-
 from stargazers import StargazersExtractor
 from summarizer import GitSummarizer
 
